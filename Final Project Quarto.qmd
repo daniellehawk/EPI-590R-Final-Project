@@ -1,0 +1,196 @@
+---
+title: "Epi 590 R Final Project"
+author: "Danielle Hawk"
+format: 
+  html:
+    theme: sandstone
+execute:
+  eval: true
+  echo: false
+---
+
+## Final Project
+
+```{r message=FALSE}
+
+## Loading necessary packages ##
+
+install.packages("gtsummary")
+install.packages("here")
+install.packages("tidyverse")
+install.packages("broom.helpers")
+install.packages("usethis")
+
+library(gtsummary)
+library(tidyverse)
+library(here)
+library(broom.helpers)
+library(usethis)
+```
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+## Reading in data and assigning names to each data frame ##
+
+
+covid_approval_polls <- read.csv(here::here("covid-19-polls-master/covid_approval_polls.csv"))
+
+covid_approval_polls$population <- toupper(covid_approval_polls$population)
+covid_approval_polls$population <- factor(covid_approval_polls$population ,
+                               levels = c("A", "RV", "LV"),
+                               label=c("Adults","Registered voters", "Likely Voters"))
+
+covid_concern_polls <-read.csv(here::here("covid-19-polls-master/covid_concern_polls.csv"))
+
+covid_concern_polls$population <- toupper(covid_concern_polls$population)
+covid_concern_polls$population <- factor(covid_concern_polls$population ,
+                               levels = c("A", "RV", "LV"),
+                               label=c("Adults","Registered voters", "Likely Voters"))
+covid_approval_polls$party <- toupper(covid_approval_polls$party)
+
+covid_approval_polls_adjusted <- read.csv(here::here(("covid-19-polls-master/covid_approval_polls_adjusted.csv")))
+
+
+covid_concern_polls_adjusted <-read.csv(here::here(("covid-19-polls-master/covid_concern_polls_adjusted.csv")))
+
+covid_approval_toplines<- read.csv(here::here(("covid-19-polls-master/covid_approval_toplines.csv")))
+
+covid_concern_toplines <- read.csv(here::here(("covid-19-polls-master/covid_concern_toplines.csv")))
+```
+
+
+
+```{r}
+## Converting columns start_data and end_date to a date variable for covid_approval_polls ##
+
+covid_approval_polls$start_date <- as.Date(covid_approval_polls$start_date, format= "%Y-%m-%d")
+
+covid_approval_polls$end_date <- as.Date(covid_approval_polls$end_date,format= "%Y-%m-%d" )
+
+## Checking the variable of the date columns 
+
+class(covid_approval_polls$start_date)
+
+class(covid_approval_polls$end_date)
+
+## Renaming columns for ease of data manipulation
+
+covid_approval_polls <-covid_approval_polls %>% 
+  rename(start_year=start_date)
+
+covid_approval_polls <-covid_approval_polls %>%
+  rename(end_year=end_date)
+
+
+
+## Converting columns start_date and end_date to a date variable for covid_concern_polls #
+
+covid_concern_polls$start_date <- as.Date(covid_concern_polls$start_date, format= "%Y-%m-%d")
+covid_concern_polls$end_date <- as.Date(covid_concern_polls$end_date,format= "%Y-%m-%d" )
+
+## Checking the variable type of the date columns
+class(covid_concern_polls$start_date)
+
+class(covid_concern_polls$end_date)
+
+## Renaming columns for ease of data manipulation
+
+covid_concern_polls <-covid_concern_polls %>% 
+  rename(start_year=start_date)
+
+covid_concern_polls <-covid_concern_polls %>%
+  rename(end_year=end_date)
+
+## Writing conditional statements to categorize dates into years for columns start_year and end_year
+#start_year
+covid_concern_polls$start_year <- ifelse(covid_concern_polls$start_year >= as.Date("2020-01-01") & covid_concern_polls$start_year <= as.Date("2020-12-31"),"2020",
+  ifelse(covid_concern_polls$start_year >= as.Date("2021-01-01") & covid_concern_polls$start_year <= as.Date("2021-12-31"),"2021","2022"))
+
+# end_year
+covid_concern_polls$end_year <- ifelse(covid_concern_polls$end_year >= as.Date("2020-01-01") & covid_concern_polls$end_year <= as.Date("2020-12-31"),"2020",
+  ifelse(covid_concern_polls$end_year >= as.Date("2021-01-01") & covid_concern_polls$end_year <= as.Date("2021-12-31"),"2021","2022"))
+
+## Creating table of descriptive statistics for both data frames
+
+#covid_approval_polls summary table
+
+tbl_summary(
+  covid_approval_polls,
+  by= party,
+  include= c(party, subject, start_year, end_year, pollster, sponsor, sample_size, population),
+  label=list(
+    subject = 'Whose handling of Covid-19 the approval poll is about',
+    start_year = 'Year the poll began', 
+    end_year = 'Year the poll ended',
+    pollster = 'Organization that conducted the poll', 
+    sponsor = 'Organization that sponsored the poll', 
+    sample_size = 'Size of Polling Sample',
+    population = 'Stratification of Voters',
+    party = 'Party of Respondents'
+),
+missing_text = 'Missing') 
+
+#covid_concern_polls summary table
+
+tbl_summary(
+  covid_concern_polls,
+  by= party,
+  include= c(party,subject, start_year, end_year, pollster, sponsor, sample_size, population),
+  label=list(
+    party = "Which subject the poll is asking Americans about",
+    subject = "Which subject the poll is asking Americans about",
+    start_year = "Year the poll began", 
+    end_year = "Year the poll ended",
+    pollster = "Organization that conducted the poll", 
+    sponsor = "Organization that sponsored the poll", 
+    sample_size = "Size of Polling Sample",
+    population = "Stratification of Voters"
+),
+    missing_text = 'Missing')
+
+
+
+```
+
+
+
+```{r}
+## Fitting regression for covid_approval_polls and covid_concern_polls
+
+ ## Running a frequency analysis and creating dummy variables for party variable
+
+covid_approval_polls$party <-ifelse(covid_approval_polls$party == "ALL", 1,
+                                    ifelse(covid_approval_polls$party == "R", 2,
+                                           ifelse(covid_approval_polls$party == "D", 3, 4)))
+
+
+## Converting population to numeric and creating dummy variables
+
+covid_approval_polls$population <- ifelse(covid_approval_polls$population == "Adults", 1,
+                                          ifelse(covid_approval_polls$population == "Registered Voters", 2, 3))
+
+
+linear_model <- lm(population ~ party + approve + disapprove,
+                      data = covid_approval_polls)
+
+tbl_regression( linear_model, 
+                intercept = TRUE,
+                label = list (
+                  party = "Party affiliated with",
+                  approve ="Approval Ratings",
+                  disapprove ="Disapproval Ratings"
+                ))
+```
+
+```{r}
+hist()
+
