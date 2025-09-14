@@ -191,6 +191,27 @@ tbl_regression( linear_model,
                 ))
 ```
 
+
+
+
 ```{r}
-hist()
+
+## Creating bar graph for party variable to display the distribution of voters from various parties in the covid approval poll
+
+par(mar = c(2.5, 4, 4, 6))
+
+barplot(table(covid_approval_polls$party),
+        main = "Distribution of Political Party Affiliations",
+        xlab = "Political Party",
+        ylab = "Voter Count",
+        col = "chocolate") 
+  
+  legend("topright", inset = c(-0.02, -0.2),
+         legend =c("All Parties", "Republican", "Democrat", "Independent"),
+         fill = c("orange", "red", "blue","chartreuse4"),
+         title = "Political Parties",
+         xpd = TRUE,
+         cex = 0.337)
+```
+
 
