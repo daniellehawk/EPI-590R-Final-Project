@@ -11,7 +11,7 @@ execute:
 
 ## Final Project
 
-```{r message=FALSE}
+```{r message=FALSE, echo=FALSE, eval=TRUE}
 
 ## Loading necessary packages ##
 
@@ -27,15 +27,6 @@ library(here)
 library(broom.helpers)
 library(usethis)
 ```
-
-
-```{r}
-
-
-
-```
-
-
 
 ```{r}
 
@@ -69,7 +60,7 @@ covid_concern_toplines <- read.csv(here::here(("covid-19-polls-master/covid_conc
 
 
 
-```{r}
+```{r echo=FALSE, include=FALSE}
 ## Converting columns start_data and end_date to a date variable for covid_approval_polls ##
 
 covid_approval_polls$start_date <- as.Date(covid_approval_polls$start_date, format= "%Y-%m-%d")
@@ -81,7 +72,9 @@ covid_approval_polls$end_date <- as.Date(covid_approval_polls$end_date,format= "
 class(covid_approval_polls$start_date)
 
 class(covid_approval_polls$end_date)
+```
 
+```{r}
 ## Renaming columns for ease of data manipulation
 
 covid_approval_polls <-covid_approval_polls %>% 
@@ -89,9 +82,9 @@ covid_approval_polls <-covid_approval_polls %>%
 
 covid_approval_polls <-covid_approval_polls %>%
   rename(end_year=end_date)
+```
 
-
-
+```{r echo=FALSE, include=FALSE}
 ## Converting columns start_date and end_date to a date variable for covid_concern_polls #
 
 covid_concern_polls$start_date <- as.Date(covid_concern_polls$start_date, format= "%Y-%m-%d")
@@ -109,7 +102,9 @@ covid_concern_polls <-covid_concern_polls %>%
 
 covid_concern_polls <-covid_concern_polls %>%
   rename(end_year=end_date)
+```
 
+```{r}
 ## Writing conditional statements to categorize dates into years for columns start_year and end_year
 #start_year
 covid_concern_polls$start_year <- ifelse(covid_concern_polls$start_year >= as.Date("2020-01-01") & covid_concern_polls$start_year <= as.Date("2020-12-31"),"2020",
@@ -118,7 +113,10 @@ covid_concern_polls$start_year <- ifelse(covid_concern_polls$start_year >= as.Da
 # end_year
 covid_concern_polls$end_year <- ifelse(covid_concern_polls$end_year >= as.Date("2020-01-01") & covid_concern_polls$end_year <= as.Date("2020-12-31"),"2020",
   ifelse(covid_concern_polls$end_year >= as.Date("2021-01-01") & covid_concern_polls$end_year <= as.Date("2021-12-31"),"2021","2022"))
+```
 
+### Summary Table for Covid Approval Polls
+```{r}
 ## Creating table of descriptive statistics for both data frames
 
 #covid_approval_polls summary table
@@ -138,7 +136,11 @@ tbl_summary(
     party = 'Party of Respondents'
 ),
 missing_text = 'Missing') 
+```
 
+
+### Summary Table for Covid Disapproval Polls
+```{r}
 #covid_concern_polls summary table
 
 tbl_summary(
@@ -162,9 +164,10 @@ tbl_summary(
 ```
 
 
-
+### Regression Table for Covid Approvals Data Frame
+### Regression Table for Population Regressed on Party, Approval Ratings and Disapproval Ratings
 ```{r}
-## Fitting regression for covid_approval_polls and covid_concern_polls
+## Fitting regression for covid_approval_polls
 
  ## Running a frequency analysis and creating dummy variables for party variable
 
@@ -192,7 +195,7 @@ tbl_regression( linear_model,
 ```
 
 
-
+### Bar Graph Depicting Party Distribution
 
 ```{r}
 
