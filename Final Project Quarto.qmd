@@ -176,7 +176,7 @@ barplot(table(covid_approval_polls$party),
          cex = 0.337)
 
 ```
-@fig-barplot contains a bar graph and @tbl-one is a regression table
+@fig-barplot contains a bar graph and @tbl-one is a regression table using data from a covid approval poll
 
 ### Functions
 
