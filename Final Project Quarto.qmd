@@ -13,13 +13,7 @@ execute:
 
 ```{r message=FALSE, echo=FALSE, eval=TRUE}
 
-## Loading necessary packages ##
-
-install.packages("gtsummary")
-install.packages("here")
-install.packages("tidyverse")
-install.packages("broom.helpers")
-install.packages("usethis")
+## Loading necessary packages 
 
 library(gtsummary)
 library(tidyverse)
@@ -60,13 +54,15 @@ covid_concern_toplines <- read.csv(here::here(("covid-19-polls-master/covid_conc
 
 
 
-```{r echo=FALSE, include=FALSE}
-## Converting columns start_data and end_date to a date variable for covid_approval_polls ##
+```{r}
+## Converting columns start_date and end_date to a date variable for covid_approval_polls ##
 
 covid_approval_polls$start_date <- as.Date(covid_approval_polls$start_date, format= "%Y-%m-%d")
 
 covid_approval_polls$end_date <- as.Date(covid_approval_polls$end_date,format= "%Y-%m-%d" )
+```
 
+```{r echo=FALSE, include=FALSE}
 ## Checking the variable of the date columns 
 
 class(covid_approval_polls$start_date)
@@ -74,48 +70,6 @@ class(covid_approval_polls$start_date)
 class(covid_approval_polls$end_date)
 ```
 
-```{r}
-## Renaming columns for ease of data manipulation
-
-covid_approval_polls <-covid_approval_polls %>% 
-  rename(start_year=start_date)
-
-covid_approval_polls <-covid_approval_polls %>%
-  rename(end_year=end_date)
-```
-
-```{r echo=FALSE, include=FALSE}
-## Converting columns start_date and end_date to a date variable for covid_concern_polls #
-
-covid_concern_polls$start_date <- as.Date(covid_concern_polls$start_date, format= "%Y-%m-%d")
-covid_concern_polls$end_date <- as.Date(covid_concern_polls$end_date,format= "%Y-%m-%d" )
-
-## Checking the variable type of the date columns
-class(covid_concern_polls$start_date)
-
-class(covid_concern_polls$end_date)
-
-## Renaming columns for ease of data manipulation
-
-covid_concern_polls <-covid_concern_polls %>% 
-  rename(start_year=start_date)
-
-covid_concern_polls <-covid_concern_polls %>%
-  rename(end_year=end_date)
-```
-
-```{r}
-## Writing conditional statements to categorize dates into years for columns start_year and end_year
-
-#start_year
-
-covid_concern_polls$start_year <- ifelse(covid_concern_polls$start_year >= as.Date("2020-01-01") & covid_concern_polls$start_year <= as.Date("2020-12-31"),"2020",
-  ifelse(covid_concern_polls$start_year >= as.Date("2021-01-01") & covid_concern_polls$start_year <= as.Date("2021-12-31"),"2021","2022"))
-
-# end_year
-covid_concern_polls$end_year <- ifelse(covid_concern_polls$end_year >= as.Date("2020-01-01") & covid_concern_polls$end_year <= as.Date("2020-12-31"),"2020",
-  ifelse(covid_concern_polls$end_year >= as.Date("2021-01-01") & covid_concern_polls$end_year <= as.Date("2021-12-31"),"2021","2022"))
-```
 
 ### Summary Table for Covid Approval Polls
 ```{r}
@@ -126,11 +80,11 @@ covid_concern_polls$end_year <- ifelse(covid_concern_polls$end_year >= as.Date("
 tbl_summary(
   covid_approval_polls,
   by= party,
-  include= c(party, subject, start_year, end_year, pollster, sponsor, sample_size, population),
+  include= c(party, subject, start_date, end_date, pollster, sponsor, sample_size, population),
   label=list(
     subject = 'Whose handling of Covid-19 the approval poll is about',
-    start_year = 'Year the poll began', 
-    end_year = 'Year the poll ended',
+    start_date = 'Year the poll began', 
+    end_date = 'Year the poll ended',
     pollster = 'Organization that conducted the poll', 
     sponsor = 'Organization that sponsored the poll', 
     sample_size = 'Size of Polling Sample',
@@ -148,12 +102,12 @@ missing_text = 'Missing')
 tbl_summary(
   covid_concern_polls,
   by= party,
-  include= c(party,subject, start_year, end_year, pollster, sponsor, sample_size, population),
+  include= c(party,subject, start_date, end_date, pollster, sponsor, sample_size, population),
   label=list(
     party = "Which subject the poll is asking Americans about",
     subject = "Which subject the poll is asking Americans about",
-    start_year = "Year the poll began", 
-    end_year = "Year the poll ended",
+    start_date = "Year the poll began", 
+    end_date = "Year the poll ended",
     pollster = "Organization that conducted the poll", 
     sponsor = "Organization that sponsored the poll", 
     sample_size = "Size of Polling Sample",
@@ -169,6 +123,9 @@ tbl_summary(
 ### Regression Table for Covid Approvals Data Frame
 ### Regression Table for Population Regressed on Party, Approval Ratings and Disapproval Ratings
 ```{r}
+#| label: tbl-one
+#| fig-cap: "This table shows a regression analysis. Ppulation is regressed on party, approval and disapproval"
+
 ## Fitting regression for covid_approval_polls
 
  ## Running a frequency analysis and creating dummy variables for party variable
@@ -195,13 +152,13 @@ tbl_regression( linear_model,
                   disapprove ="Disapproval Ratings"
                 ))
 ```
-
+There were`r nrow(covid_approval_polls$sponsor) sponsors of this poll`
 
 ### Bar Graph Depicting Party Distribution
 
 ```{r}
-
-## Creating bar graph for party variable to display the distribution of voters from various parties in the covid approval poll
+#| label: fig-barplot
+#| fig-cap: "This bar plot shows the distribution of party affiliations."
 
 par(mar = c(2.5, 4, 4, 6))
 
@@ -217,16 +174,23 @@ barplot(table(covid_approval_polls$party),
          title = "Political Parties",
          xpd = TRUE,
          cex = 0.337)
+
 ```
+@fig-barplot contains a bar graph and @tbl-one is a regression table
+
 ### Functions
-### Graph Function
 
 ```{r}
 
-bar_graph <- function()
- }
+percent_func <- function(x){
+  addition <- sum(x)
+  divide <- x/addition
+  multiply <- divide*100
+return(multiply)
+}
 
+percent_func(covid_approval_polls$party[1])
 
+```
 
- 
 
