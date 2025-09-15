@@ -152,7 +152,7 @@ tbl_regression( linear_model,
                   disapprove ="Disapproval Ratings"
                 ))
 ```
-There were`r nrow(covid_approval_polls$sponsor) sponsors of this poll`
+There were`r nrow(covid_approval_polls$sponsor)` sponsors of this poll
 
 ### Bar Graph Depicting Party Distribution
 
